@@ -32,7 +32,7 @@ const Navbar = () => {
 
   return (
     <React.Fragment>
-      <Flex align='center' justify='space-between' mb='8' py='2'>
+      <Flex align='center' justify='space-between' mb='4' py='2'>
         <Image alt='Acabados Palma' src={logo} w='48' />
         <IconButton
           aria-label='Menú'

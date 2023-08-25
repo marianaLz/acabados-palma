@@ -2,12 +2,11 @@ import * as React from 'react';
 import * as Yup from 'yup';
 import { getAuth } from 'firebase/auth';
 import { navigate } from 'gatsby';
-import { useFormik } from 'formik';
+import { FieldArray, FormikProvider, useFormik } from 'formik';
 
 import {
+  Box,
   Button,
-  Card,
-  CardBody,
   Checkbox,
   CheckboxGroup,
   Container,
@@ -16,13 +15,20 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
+  IconButton,
   Input,
   Select,
+  Textarea,
+  useToast,
 } from '@chakra-ui/react';
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 
 import Navbar from '../components/navbar';
 
+import { createQuote } from '../firebase/quotes';
+
 const NewQuote = () => {
+  const toast = useToast();
   const { currentUser } = getAuth();
 
   const formik = useFormik({
@@ -32,6 +38,7 @@ const NewQuote = () => {
       name: '',
       client: '',
       date: '',
+      products: [],
       deliveryTime: '',
       validity: '',
       advancePaymentRate: '',
@@ -42,29 +49,26 @@ const NewQuote = () => {
       name: Yup.string().required('Este campo es requerido'),
       client: Yup.string().required('Este campo es requerido'),
       date: Yup.string().required('Este campo es requerido'),
+      products: Yup.array().required('Este campo es requerido'),
       deliveryTime: Yup.string().required('Este campo es requerido'),
       validity: Yup.string().required('Este campo es requerido'),
       advancePaymentRate: Yup.string().required('Este campo es requerido'),
       hasTotalCalc: Yup.string().required('Este campo es requerido'),
       notes: Yup.array().required('Este campo es requerido'),
     }),
-    onSubmit: (values, { setSubmitting }) => {
-      console.log(values);
-      // login(values).then(({ response, msg }) => {
-      //   setSubmitting(false);
-      //   if (response === 'error') {
-      //     toast({
-      //       title: 'Error',
-      //       description: msg,
-      //       status: 'error',
-      //       duration: 3000,
-      //       isClosable: true,
-      //       position: 'top-right',
-      //     });
-      //   } else {
-      //     navigate('/all-quotes');
-      //   }
-      // });
+    onSubmit: (values, { resetForm, setSubmitting }) => {
+      createQuote(values).then((quote) => {
+        setSubmitting(false);
+        toast({
+          title: 'Todo salió bien',
+          description: 'Presupuesto creado de manera exitosa',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+          position: 'top-right',
+        });
+        resetForm({ values: formik.initialValues });
+      });
     },
   });
 
@@ -75,10 +79,10 @@ const NewQuote = () => {
   return (
     <Container as='main'>
       <Navbar />
-      <Flex align='center' justify='center' minH='calc(100vh - 121px)'>
-        <Card as='form' onSubmit={formik.handleSubmit} w='full'>
-          <CardBody as={Flex} flexDir='column' gap='4'>
-            <Heading textAlign='center' color='blackAlpha.800' mb='0' size='lg'>
+      <Flex align='center' justify='center' minH='calc(100vh - 121px)' mb='8'>
+        <Box as='form' onSubmit={formik.handleSubmit} w='full'>
+          <Flex flexDir='column' gap='4'>
+            <Heading textAlign='center' color='blackAlpha.800' size='lg'>
               Crea tu presupuesto
             </Heading>
             <FormControl isInvalid={!!formik.errors.name}>
@@ -113,13 +117,95 @@ const NewQuote = () => {
                 <FormErrorMessage>{formik.errors.date}</FormErrorMessage>
               </FormControl>
             </Flex>
+            <FormControl isInvalid={!!formik.errors.products}>
+              <FormLabel>Productos:</FormLabel>
+              <FormikProvider value={formik}>
+                <FieldArray name='products'>
+                  {({ remove, push }) => (
+                    <Flex flexDirection='column' w='full' gap='8'>
+                      {formik.values.products?.map((_, index) => (
+                        <Flex gap='4' key={`product-${index}`}>
+                          <Flex flexDir='column' gap='4'>
+                            <Textarea
+                              name={`products.${index}.concept`}
+                              onChange={formik.handleChange}
+                              placeholder='Concepto'
+                              value={formik.values.products?.[index]?.concept}
+                              error={formik.errors.products?.[index]?.concept}
+                            />
+
+                            <Flex gap='4'>
+                              <Input
+                                name={`products.${index}.quantity`}
+                                onChange={formik.handleChange}
+                                placeholder='Cantidad'
+                                type='number'
+                                value={
+                                  formik.values.products?.[index]?.quantity
+                                }
+                                error={
+                                  formik.errors.products?.[index]?.quantity
+                                }
+                              />
+                              <Select
+                                name={`products.${index}.unit`}
+                                onChange={formik.handleChange}
+                                placeholder='Unidad'
+                                value={formik.values.products?.[index]?.unit}
+                                error={formik.errors.products?.[index]?.unit}
+                              >
+                                <option value='m'>m</option>
+                                <option value='m²'>m²</option>
+                                <option value='m³'>m³</option>
+                                <option value='kg'>kg.</option>
+                                <option value='pza.'>pza.</option>
+                                <option value='lote'>lote</option>
+                              </Select>
+                              <Input
+                                name={`products.${index}.price`}
+                                onChange={formik.handleChange}
+                                placeholder='Precio'
+                                type='number'
+                                value={formik.values.products?.[index]?.price}
+                                error={formik.errors.products?.[index]?.price}
+                              />
+                            </Flex>
+                          </Flex>
+                          <IconButton
+                            bgColor='red.500'
+                            icon={<DeleteIcon color='white' />}
+                            onClick={() => remove(index)}
+                            _hover={{ bgColor: 'red.300' }}
+                          />
+                        </Flex>
+                      ))}
+
+                      <Button
+                        border={
+                          !!formik.errors.products
+                            ? '2px solid red'
+                            : '2px solid transparent'
+                        }
+                        onClick={() => push({})}
+                        rightIcon={<AddIcon />}
+                        w={{ base: 'full', lg: '48' }}
+                      >
+                        Agregar producto
+                      </Button>
+                    </Flex>
+                  )}
+                </FieldArray>
+              </FormikProvider>
+              <FormErrorMessage>{formik.errors.products}</FormErrorMessage>
+            </FormControl>
             <Flex flexDir={{ base: 'column', lg: 'row' }} gap='4'>
               <FormControl isInvalid={!!formik.errors.deliveryTime}>
                 <FormLabel>Tiempo de entrega:</FormLabel>
                 <Input
                   name='deliveryTime'
                   onChange={formik.handleChange}
-                  placeholder='Escribe el número de días'
+                  placeholder='Número de días hábiles'
+                  type='number'
                   value={formik.values.deliveryTime}
                 />
                 <FormErrorMessage>
@@ -131,7 +217,8 @@ const NewQuote = () => {
                 <Input
                   name='validity'
                   onChange={formik.handleChange}
-                  placeholder='Escribe el número de días'
+                  placeholder='Número de días hábiles'
+                  type='number'
                   value={formik.values.validity}
                 />
                 <FormErrorMessage>{formik.errors.validity}</FormErrorMessage>
@@ -144,6 +231,7 @@ const NewQuote = () => {
                   name='advancePaymentRate'
                   onChange={formik.handleChange}
                   placeholder='Ej. 70'
+                  type='number'
                   value={formik.values.advancePaymentRate}
                 />
                 <FormErrorMessage>
@@ -158,8 +246,8 @@ const NewQuote = () => {
                   placeholder='Selecciona una opción'
                   value={formik.values.hasTotalCalc}
                 >
-                  <option value='yes'>Sí</option>
-                  <option value='no'>No</option>
+                  <option value='true'>Sí</option>
+                  <option value='false'>No</option>
                 </Select>
                 <FormErrorMessage>
                   {formik.errors.hasTotalCalc}
@@ -195,10 +283,10 @@ const NewQuote = () => {
               loadingText='Iniciando sesión'
               type='submit'
             >
-              Revisar
+              Generar presupuesto
             </Button>
-          </CardBody>
-        </Card>
+          </Flex>
+        </Box>
       </Flex>
     </Container>
   );
