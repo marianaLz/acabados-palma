@@ -14,7 +14,11 @@ export const getQuotes = async () => {
   try {
     const querySnapshot = await getDocs(collection(db, 'quotes'));
     const quotes = querySnapshot.docs.map((doc) => {
-      return { ...doc.data(), id: doc.id };
+      return {
+        ...doc.data(),
+        id: doc.id,
+        createdAt: new Date(doc._document.createTime.timestamp.seconds * 1000),
+      };
     });
     return quotes;
   } catch (error) {

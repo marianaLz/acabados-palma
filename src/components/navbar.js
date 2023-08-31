@@ -24,7 +24,7 @@ import { logout } from '../firebase/auth';
 
 import logo from '../images/logo.png';
 
-const Navbar = () => {
+const Navbar = ({ secondary = false }) => {
   const auth = getAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -32,8 +32,20 @@ const Navbar = () => {
 
   return (
     <React.Fragment>
-      <Flex align='center' justify='space-between' mb='4' py='2'>
-        <Image alt='Acabados Palma' src={logo} w='48' />
+      <Flex
+        align='center'
+        className='no-printme'
+        justify='space-between'
+        mb='4'
+        py='2'
+      >
+        {secondary ? (
+          <Button as={Link} to='/all-quotes' variant='outline'>
+            Regresar
+          </Button>
+        ) : (
+          <Image alt='Acabados Palma' src={logo} w='48' />
+        )}
         <IconButton
           aria-label='Menú'
           colorScheme='teal'
