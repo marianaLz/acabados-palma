@@ -78,7 +78,7 @@ const NewQuote = () => {
   }, [currentUser]);
 
   return (
-    <Container as='main'>
+    <Container as='main' maxW='container.md'>
       <Navbar />
       <Flex mb='8'>
         <Box as='form' onSubmit={formik.handleSubmit} w='full'>

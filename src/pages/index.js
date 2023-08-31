@@ -73,7 +73,7 @@ const IndexPage = () => {
   }, [currentUser]);
 
   return (
-    <Container as='main'>
+    <Container as='main' maxW='container.md'>
       <Flex align='center' justify='center' minH='100vh'>
         <Card as='form' onSubmit={formik.handleSubmit} w='sm'>
           <CardHeader

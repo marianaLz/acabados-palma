@@ -13,4 +13,9 @@
   .no-printme {
     display: none !important;
   }
+  #document td,
+  #document th {
+    font-size: 11px;
+    padding: 4px 8px !important;
+  }
 }

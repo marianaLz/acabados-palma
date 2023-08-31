@@ -37,13 +37,13 @@ const AllQuotes = () => {
   }, []);
 
   return (
-    <Container as='main'>
+    <Container as='main' maxW='container.md'>
       <Navbar />
       <Flex justify='center' mb='8'>
         {loading ? (
           <Loader />
         ) : (
-          <Table size={{ base: 'sm', lg: 'md' }} variant='striped'>
+          <Table size='sm' variant='striped'>
             <Thead>
               <Tr>
                 <Th>Presupuesto</Th>

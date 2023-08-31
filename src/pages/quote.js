@@ -52,7 +52,7 @@ const Quote = ({ location: { search } }) => {
   }, [id]);
 
   return (
-    <Container as='main'>
+    <Container as='main' maxW='container.md'>
       <Navbar secondary />
       <Flex align='center' flexDir='column' gap='8' justify='center'>
         {loading ? (
