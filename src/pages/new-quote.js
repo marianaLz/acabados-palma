@@ -57,7 +57,7 @@ const NewQuote = () => {
       notes: Yup.array().required('Este campo es requerido'),
     }),
     onSubmit: (values, { resetForm, setSubmitting }) => {
-      createQuote(values).then((quote) => {
+      createQuote(values).then(() => {
         setSubmitting(false);
         toast({
           title: 'Todo salió bien',
@@ -68,6 +68,7 @@ const NewQuote = () => {
           position: 'top-right',
         });
         resetForm({ values: formik.initialValues });
+        navigate('/all-quotes');
       });
     },
   });
@@ -76,14 +77,10 @@ const NewQuote = () => {
     if (!currentUser) navigate('/');
   }, [currentUser]);
 
-  const printComponent = () => {
-    window.print();
-  };
-
   return (
     <Container as='main'>
       <Navbar />
-      <Flex align='center' justify='center' minH='calc(100vh - 121px)' mb='8'>
+      <Flex mb='8'>
         <Box as='form' onSubmit={formik.handleSubmit} w='full'>
           <Flex flexDir='column' gap='4'>
             <Heading textAlign='center' color='blackAlpha.800' size='lg'>
@@ -285,8 +282,7 @@ const NewQuote = () => {
               colorScheme='teal'
               isLoading={formik.isSubmitting}
               loadingText='Iniciando sesión'
-              onClick={printComponent}
-              // type='submit'
+              type='submit'
             >
               Generar presupuesto
             </Button>
