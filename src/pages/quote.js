@@ -62,12 +62,12 @@ const Quote = ({ location: { search } }) => {
             align='center'
             flexDir='column'
             fontSize='xs'
-            gap='8'
+            gap='12'
             id='document'
             w='full'
           >
             <Flex align='center' gap='8' justify='space-between' w='full'>
-              <Image alt='Acabados Palma' src={logo} w='48' />
+              <Image alt='Acabados Palma' src={logo} w='56' />
               <Flex flexDir='column'>
                 <Text>
                   Fecha:{' '}
