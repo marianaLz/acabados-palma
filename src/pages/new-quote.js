@@ -76,6 +76,10 @@ const NewQuote = () => {
     if (!currentUser) navigate('/');
   }, [currentUser]);
 
+  const printComponent = () => {
+    window.print();
+  };
+
   return (
     <Container as='main'>
       <Navbar />
@@ -281,7 +285,8 @@ const NewQuote = () => {
               colorScheme='teal'
               isLoading={formik.isSubmitting}
               loadingText='Iniciando sesión'
-              type='submit'
+              onClick={printComponent}
+              // type='submit'
             >
               Generar presupuesto
             </Button>
