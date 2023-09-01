@@ -97,7 +97,7 @@ const FormQuote = ({ location: { search } }) => {
 
   return (
     <Container as='main' maxW='container.md'>
-      <Navbar />
+      <Navbar secondary />
       <Flex mb='8'>
         <Box as='form' onSubmit={formik.handleSubmit} w='full'>
           <Flex align='center' flexDir='column' gap='4'>

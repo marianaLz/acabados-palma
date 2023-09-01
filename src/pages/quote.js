@@ -123,7 +123,7 @@ const Quote = ({ location: { search } }) => {
                   <Th>Concepto</Th>
                   <Th>Cantidad</Th>
                   <Th>Unidad</Th>
-                  <Th>P. Unit.</Th>
+                  <Th minW='65px'>P. Unit.</Th>
                   <Th>Importe</Th>
                 </Tr>
               </Thead>
