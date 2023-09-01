@@ -32,7 +32,7 @@ const AllQuotes = () => {
   React.useEffect(() => {
     getQuotes().then((res) => {
       setLoading(false);
-      setQuotes(res.sort((a, b) => b.createdAt - a.createdAt));
+      setQuotes(res.sort((a, b) => new Date(b.date) - new Date(a.date)));
     });
   }, []);
 
@@ -48,15 +48,15 @@ const AllQuotes = () => {
               <Tr>
                 <Th>Presupuesto</Th>
                 <Th>Cliente</Th>
-                <Th isNumeric>Creación</Th>
+                <Th isNumeric>Fecha</Th>
               </Tr>
             </Thead>
             <Tbody>
-              {quotes?.map(({ name, client, createdAt, id }, index) => (
+              {quotes?.map(({ name, client, date, id }, index) => (
                 <Tr key={`quote-${index}`}>
                   <Td>{name}</Td>
                   <Td>{client}</Td>
-                  <Td isNumeric>{formatDate(createdAt)}</Td>
+                  <Td isNumeric>{formatDate(date)}</Td>
                   <Td>
                     <Link
                       display='flex'
