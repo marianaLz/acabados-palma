@@ -18,6 +18,7 @@ import {
   IconButton,
   Input,
   Select,
+  SimpleGrid,
   Textarea,
   useToast,
 } from '@chakra-ui/react';
@@ -25,26 +26,34 @@ import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 
 import Navbar from '../components/navbar';
 
-import { createQuote } from '../firebase/quotes';
+import { createQuote, getQuote, updateQuote } from '../firebase/quotes';
 
-const NewQuote = () => {
+const FormQuote = ({ location: { search } }) => {
+  const params = new URLSearchParams(search);
+  const id = params.get('id');
+
   const toast = useToast();
   const { currentUser } = getAuth();
+  const [quote, setQuote] = React.useState({});
+
+  const request = !!id ? updateQuote : createQuote;
 
   const formik = useFormik({
     enableReinitialize: true,
     validateOnChange: false,
-    initialValues: {
-      name: '',
-      client: '',
-      date: '',
-      products: [],
-      deliveryTime: '',
-      validity: '',
-      advancePaymentRate: '',
-      hasTotalCalc: '',
-      notes: [],
-    },
+    initialValues: !!id
+      ? quote
+      : {
+          name: '',
+          client: '',
+          date: '',
+          products: [],
+          deliveryTime: '',
+          validity: '',
+          advancePaymentRate: '',
+          hasTotalCalc: '',
+          notes: [],
+        },
     validationSchema: Yup.object({
       name: Yup.string().required('Este campo es requerido'),
       client: Yup.string().required('Este campo es requerido'),
@@ -57,11 +66,13 @@ const NewQuote = () => {
       notes: Yup.array().required('Este campo es requerido'),
     }),
     onSubmit: (values, { resetForm, setSubmitting }) => {
-      createQuote(values).then(() => {
+      request(values, id).then(() => {
         setSubmitting(false);
         toast({
           title: 'Todo salió bien',
-          description: 'Presupuesto creado de manera exitosa',
+          description: `Presupuesto ${
+            !!id ? 'modificado' : 'creado'
+          } de manera exitosa`,
           status: 'success',
           duration: 3000,
           isClosable: true,
@@ -74,6 +85,13 @@ const NewQuote = () => {
   });
 
   React.useEffect(() => {
+    !!id &&
+      getQuote(id).then((res) => {
+        setQuote(res);
+      });
+  }, [id]);
+
+  React.useEffect(() => {
     if (!currentUser) navigate('/');
   }, [currentUser]);
 
@@ -82,9 +100,9 @@ const NewQuote = () => {
       <Navbar />
       <Flex mb='8'>
         <Box as='form' onSubmit={formik.handleSubmit} w='full'>
-          <Flex flexDir='column' gap='4'>
+          <Flex align='center' flexDir='column' gap='4'>
             <Heading textAlign='center' color='blackAlpha.800' size='lg'>
-              Crea tu presupuesto
+              {!!id ? 'Modifica tu presupuesto' : 'Crea tu presupuesto'}
             </Heading>
             <FormControl isInvalid={!!formik.errors.name}>
               <FormLabel>Nombre del presupuesto:</FormLabel>
@@ -96,7 +114,7 @@ const NewQuote = () => {
               />
               <FormErrorMessage>{formik.errors.name}</FormErrorMessage>
             </FormControl>
-            <Flex flexDir={{ base: 'column', lg: 'row' }} gap='4'>
+            <Flex flexDir={{ base: 'column', lg: 'row' }} gap='4' w='full'>
               <FormControl isInvalid={!!formik.errors.client}>
                 <FormLabel>Cliente:</FormLabel>
                 <Input
@@ -126,7 +144,7 @@ const NewQuote = () => {
                     <Flex flexDirection='column' w='full' gap='8'>
                       {formik.values.products?.map((_, index) => (
                         <Flex gap='4' key={`product-${index}`}>
-                          <Flex flexDir='column' gap='4'>
+                          <Flex flexDir='column' gap='4' flex='1'>
                             <Textarea
                               name={`products.${index}.concept`}
                               onChange={formik.handleChange}
@@ -199,7 +217,7 @@ const NewQuote = () => {
               </FormikProvider>
               <FormErrorMessage>{formik.errors.products}</FormErrorMessage>
             </FormControl>
-            <Flex flexDir={{ base: 'column', lg: 'row' }} gap='4'>
+            <SimpleGrid columns='2' gap='4' w='full'>
               <FormControl isInvalid={!!formik.errors.deliveryTime}>
                 <FormLabel>Tiempo de entrega:</FormLabel>
                 <Input
@@ -224,8 +242,6 @@ const NewQuote = () => {
                 />
                 <FormErrorMessage>{formik.errors.validity}</FormErrorMessage>
               </FormControl>
-            </Flex>
-            <Flex flexDir={{ base: 'column', lg: 'row' }} gap='4'>
               <FormControl isInvalid={!!formik.errors.advancePaymentRate}>
                 <FormLabel>Porcentaje de anticipo:</FormLabel>
                 <Input
@@ -254,7 +270,7 @@ const NewQuote = () => {
                   {formik.errors.hasTotalCalc}
                 </FormErrorMessage>
               </FormControl>
-            </Flex>
+            </SimpleGrid>
             <FormControl
               as={Flex}
               flexDir='column'
@@ -281,10 +297,10 @@ const NewQuote = () => {
             <Button
               colorScheme='teal'
               isLoading={formik.isSubmitting}
-              loadingText='Iniciando sesión'
+              loadingText='Cargando...'
               type='submit'
             >
-              Generar presupuesto
+              {!!id ? 'Modificar presupuesto' : 'Generar presupuesto'}
             </Button>
           </Flex>
         </Box>
@@ -293,4 +309,4 @@ const NewQuote = () => {
   );
 };
 
-export default NewQuote;
+export default FormQuote;

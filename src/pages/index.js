@@ -133,7 +133,7 @@ const IndexPage = () => {
             <Button
               colorScheme='teal'
               isLoading={formik.isSubmitting}
-              loadingText='Iniciando sesión'
+              loadingText='Cargando...'
               type='submit'
             >
               Iniciar sesión

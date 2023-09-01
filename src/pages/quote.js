@@ -1,10 +1,17 @@
 import React from 'react';
 import { getAuth } from 'firebase/auth';
-import { navigate } from 'gatsby';
+import { Link, navigate } from 'gatsby';
 
 import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
   Button,
   Container,
+  Divider,
   Flex,
   Image,
   ListItem,
@@ -16,13 +23,15 @@ import {
   Thead,
   Tr,
   UnorderedList,
+  useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 
 import Loader from '../components/loader';
 import Navbar from '../components/navbar';
 
 import { calculateTotalPrice, formatDate, formatPrice } from '../utils';
-import { getQuote } from '../firebase/quotes';
+import { deleteQuote, getQuote } from '../firebase/quotes';
 
 import logo from '../images/logo.png';
 
@@ -30,14 +39,33 @@ import '../index.css';
 
 const Quote = ({ location: { search } }) => {
   const { currentUser } = getAuth();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
   const [loading, setLoading] = React.useState(true);
   const [quote, setQuote] = React.useState({});
 
+  const cancelRef = React.useRef();
   const params = new URLSearchParams(search);
   const id = params.get('id');
+  const toast = useToast();
 
   const printDoc = () => {
     window.print();
+  };
+
+  const handleDelete = () => {
+    deleteQuote(id).then(() => {
+      toast({
+        title: 'Todo salió bien',
+        description: 'Presupuesto eliminado de manera exitosa',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      navigate('/all-quotes');
+      onClose();
+    });
   };
 
   React.useEffect(() => {
@@ -124,7 +152,7 @@ const Quote = ({ location: { search } }) => {
                 )}
               </Tbody>
             </Table>
-            <Flex flexDir='column' gap='1'>
+            <Flex flexDir='column' gap='1' w='full'>
               <Text>Notas:</Text>
               <UnorderedList>
                 {quote.notes?.map((note, index) => (
@@ -155,17 +183,53 @@ const Quote = ({ location: { search } }) => {
               <Text>(55) 8410 0093</Text>
               <Text>capb_interiorismo@hotmail.com</Text>
             </Flex>
-            <Button
+            <Flex
+              align='center'
               className='no-printme'
-              colorScheme='teal'
+              flexDir='column'
+              gap='4'
               mb='8'
-              onClick={printDoc}
             >
-              Imprimir
-            </Button>
+              <Flex gap='4'>
+                <Button as={Link} to={`/form-quote?id=${id}`}>
+                  Modificar
+                </Button>
+                <Button colorScheme='teal' onClick={printDoc}>
+                  Imprimir
+                </Button>
+              </Flex>
+              <Divider />
+              <Button color='red.500' onClick={onOpen} size='sm' variant='link'>
+                Eliminar
+              </Button>
+            </Flex>
           </Flex>
         )}
       </Flex>
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+              Eliminar presupuesto
+            </AlertDialogHeader>
+            <AlertDialogBody>
+              ¿Estás seguro de eliminar este presupuesto?
+            </AlertDialogBody>
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Cancelar
+              </Button>
+              <Button colorScheme='red' onClick={handleDelete} ml={3}>
+                Eliminar
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Container>
   );
 };

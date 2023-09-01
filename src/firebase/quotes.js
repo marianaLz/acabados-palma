@@ -44,7 +44,7 @@ export const getQuote = async (id) => {
   }
 };
 
-export const updateQuote = async (id, quote) => {
+export const updateQuote = async (quote, id) => {
   try {
     await updateDoc(doc(db, 'quotes', id), quote);
     return getQuote(id);

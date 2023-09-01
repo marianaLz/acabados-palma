@@ -71,7 +71,7 @@ const Navbar = ({ secondary = false }) => {
                   bg: 'gray.100',
                 }}
               >
-                <Link to='/new-quote'>Crear un nuevo presupuesto</Link>
+                <Link to='/form-quote'>Crear un nuevo presupuesto</Link>
               </ListItem>
               <ListItem
                 borderRadius='md'
