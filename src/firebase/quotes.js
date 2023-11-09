@@ -21,7 +21,7 @@ export const getQuotes = async () => {
     });
     return quotes;
   } catch (error) {
-    return { response: 'error', msg: 'Error al obtener la colección' };
+    return { response: 'error', msg: error };
   }
 };
 

@@ -31,8 +31,9 @@ const AllQuotes = () => {
 
   React.useEffect(() => {
     getQuotes().then((res) => {
+      console.log(res);
       setLoading(false);
-      setQuotes(res.sort((a, b) => new Date(b.date) - new Date(a.date)));
+      // setQuotes(res.sort((a, b) => new Date(b.date) - new Date(a.date)));
     });
   }, []);
 
