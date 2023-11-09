@@ -30,6 +30,7 @@ export const createQuote = async (quote) => {
     const docSnap = await addDoc(collection(db, 'quotes'), quote);
     return getQuote(docSnap.id);
   } catch (e) {
+    console.log(e);
     return { response: 'error', msg: 'Error al crear el documento' };
   }
 };
