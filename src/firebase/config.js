@@ -2,8 +2,10 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
+const FIREBASE_API_KEY = import.meta.env.FIREBASE_API_KEY;
+
 const firebaseConfig = {
-  apiKey: 'AIzaSyCIkvKvMCWgCAJHnI-DE74i4QuxGvRbJfs',
+  apiKey: FIREBASE_API_KEY,
   authDomain: 'acabados-palma.firebaseapp.com',
   projectId: 'acabados-palma',
   storageBucket: 'acabados-palma.appspot.com',
