@@ -69,7 +69,7 @@ const AllQuotes = () => {
                       as={RouterLink}
                       color='teal.500'
                       to={
-                        document.products
+                        products?.length > 0
                           ? `/quote?id=${id}`
                           : `/warranty?id=${id}`
                       }
