@@ -18,21 +18,27 @@ import Loader from '../components/loader';
 import Navbar from '../components/navbar';
 
 import { formatDate } from '../utils';
-import { getQuotes } from '../firebase/quotes';
+import { getDocuments } from '../firebase/documents';
 
 const AllQuotes = () => {
   const { currentUser } = getAuth();
   const [loading, setLoading] = React.useState(true);
-  const [quotes, setQuotes] = React.useState([]);
+  const [documents, setDocuments] = React.useState([]);
 
   React.useEffect(() => {
     if (!currentUser) navigate('/');
   }, [currentUser]);
 
   React.useEffect(() => {
-    getQuotes().then((res) => {
-      setLoading(false);
-      setQuotes(res.sort((a, b) => new Date(b.date) - new Date(a.date)));
+    getDocuments('quotes').then((quotes) => {
+      getDocuments('warranties').then((warranties) => {
+        setLoading(false);
+        setDocuments(
+          [...quotes, ...warranties].sort(
+            (a, b) => new Date(b.date) - new Date(a.date)
+          )
+        );
+      });
     });
   }, []);
 
@@ -46,13 +52,13 @@ const AllQuotes = () => {
           <Table size='sm' variant='striped'>
             <Thead>
               <Tr>
-                <Th>Presupuesto</Th>
+                <Th>Documento</Th>
                 <Th>Cliente</Th>
                 <Th isNumeric>Fecha</Th>
               </Tr>
             </Thead>
             <Tbody>
-              {quotes?.map(({ name, client, date, id }, index) => (
+              {documents?.map(({ name, client, date, id, products }, index) => (
                 <Tr key={`quote-${index}`}>
                   <Td>{name}</Td>
                   <Td>{client}</Td>
@@ -62,7 +68,11 @@ const AllQuotes = () => {
                       display='flex'
                       as={RouterLink}
                       color='teal.500'
-                      to={`/quote?id=${id}`}
+                      to={
+                        document.products
+                          ? `/quote?id=${id}`
+                          : `/warranty?id=${id}`
+                      }
                     >
                       Ver
                     </Link>

@@ -60,7 +60,7 @@ const IndexPage = () => {
             position: 'top-right',
           });
         } else {
-          navigate('/all-quotes');
+          navigate('/all-documents');
         }
       });
     },
@@ -69,7 +69,7 @@ const IndexPage = () => {
   const handleShow = () => setShow(!show);
 
   React.useEffect(() => {
-    if (currentUser) navigate('/all-quotes');
+    if (currentUser) navigate('/all-documents');
   }, [currentUser]);
 
   return (

@@ -14,15 +14,7 @@ import {
   Divider,
   Flex,
   Image,
-  ListItem,
-  Table,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
-  UnorderedList,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react';
@@ -30,19 +22,20 @@ import {
 import Loader from '../components/loader';
 import Navbar from '../components/navbar';
 
-import { calculateTotalPrice, formatDate, formatPrice } from '../utils';
+import { formatDate } from '../utils';
 import { deleteDocument, getDocument } from '../firebase/documents';
 
+import firma from '../images/firma.png';
 import logo from '../images/logo.png';
 
 import '../index.css';
 
-const Quote = ({ location: { search } }) => {
+const Warranty = ({ location: { search } }) => {
   const { currentUser } = getAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const [loading, setLoading] = React.useState(true);
-  const [quote, setQuote] = React.useState({});
+  const [warranty, setWarranty] = React.useState({});
 
   const cancelRef = React.useRef();
   const params = new URLSearchParams(search);
@@ -54,7 +47,7 @@ const Quote = ({ location: { search } }) => {
   };
 
   const handleDelete = () => {
-    deleteDocument('quotes', id).then(() => {
+    deleteDocument('warranties', id).then(() => {
       toast({
         title: 'Todo salió bien',
         description: 'Presupuesto eliminado de manera exitosa',
@@ -73,9 +66,9 @@ const Quote = ({ location: { search } }) => {
   }, [currentUser]);
 
   React.useEffect(() => {
-    getDocument('quotes', id).then((res) => {
+    getDocument('warranties', id).then((res) => {
       setLoading(false);
-      setQuote(res);
+      setWarranty(res);
     });
   }, [id]);
 
@@ -100,95 +93,27 @@ const Quote = ({ location: { search } }) => {
                 <Text>
                   Fecha:{' '}
                   <Text as='span' fontWeight='medium'>
-                    {formatDate(quote.date, 'long')}
-                  </Text>
-                </Text>
-                <Text>
-                  Presupuesto:{' '}
-                  <Text as='span' fontWeight='medium'>
-                    {quote.name}
+                    {formatDate(warranty.date, 'long')}
                   </Text>
                 </Text>
                 <Text>
                   Atención:{' '}
                   <Text as='span' fontWeight='medium'>
-                    {quote.client}
+                    {warranty.client}
                   </Text>
                 </Text>
               </Flex>
             </Flex>
-            <Table variant='striped'>
-              <Thead>
-                <Tr>
-                  <Th>Concepto</Th>
-                  <Th>Cantidad</Th>
-                  <Th>Unidad</Th>
-                  <Th minW='65px'>P. Unit.</Th>
-                  <Th>Importe</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {quote.products?.map(
-                  ({ concept, quantity, unit, price }, index) => (
-                    <Tr key={`quote-${index}`}>
-                      <Td>{concept}</Td>
-                      <Td>{quantity}</Td>
-                      <Td>{unit}</Td>
-                      <Td>{formatPrice(price)}</Td>
-                      <Td>{formatPrice(quantity * price)}</Td>
-                    </Tr>
-                  )
-                )}
-                {quote.hasTaxes === 'true' && (
-                  <Tr>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td isNumeric>I.V.A.</Td>
-                    <Td>
-                      {formatPrice(calculateTotalPrice(quote.products) * 0.16)}
-                    </Td>
-                  </Tr>
-                )}
-                {quote.hasTotalCalc === 'true' && (
-                  <Tr>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td></Td>
-                    <Td fontWeight='bold' isNumeric>
-                      TOTAL
-                    </Td>
-                    <Td>
-                      {formatPrice(
-                        quote.hasTaxes === 'true'
-                          ? calculateTotalPrice(quote.products) * 1.16
-                          : calculateTotalPrice(quote.products)
-                      )}
-                    </Td>
-                  </Tr>
-                )}
-              </Tbody>
-            </Table>
-            <Flex flexDir='column' gap='1' w='full'>
-              <Text>Notas:</Text>
-              <UnorderedList>
-                {quote.notes?.map((note, index) => (
-                  <ListItem key={`note-${index}`}>{note}</ListItem>
-                ))}
-                <ListItem>
-                  {`Para ejecutar dichos trabajos, se requiere un anticipo del
-                  ${quote.advancePaymentRate}%, el resto se cobrará conforme al
-                  avance de obra`}
-                </ListItem>
-                <ListItem>
-                  {`El tiempo de entrega es de ${quote.deliveryTime} días hábiles`}
-                </ListItem>
-                <ListItem>
-                  {`Esta cotización tiene una vigencia de ${quote.validity} días
-                  hábiles a partir de la fecha en la misma`}
-                </ListItem>
-              </UnorderedList>
+            <Flex flexDir='column' gap='4'>
+              <Text align='center' fontSize='sm' fontWeight='semibold'>
+                {warranty.name}
+              </Text>
+              <Text>{warranty.client},</Text>
+              {warranty.paragraphs?.map((paragraph, index) => (
+                <Text key={`paragraph-${index}`}>{paragraph}</Text>
+              ))}
             </Flex>
+            <Image alt='Acabados Palma' mb='-28' src={firma} w='32' />
             <Flex flexDir='column' fontWeight='bold' textAlign='center'>
               <Text fontSize='2xs' letterSpacing='widest'>
                 ATENTAMENTE
@@ -208,7 +133,7 @@ const Quote = ({ location: { search } }) => {
               mb='8'
             >
               <Flex gap='4'>
-                <Button as={Link} to={`/form-quote?id=${id}`}>
+                <Button as={Link} to={`/form-warranty?id=${id}`}>
                   Modificar
                 </Button>
                 <Button colorScheme='teal' onClick={printDoc}>
@@ -251,4 +176,4 @@ const Quote = ({ location: { search } }) => {
   );
 };
 
-export default Quote;
+export default Warranty;

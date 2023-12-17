@@ -26,7 +26,11 @@ import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 
 import Navbar from '../components/navbar';
 
-import { createQuote, getQuote, updateQuote } from '../firebase/quotes';
+import {
+  createDocument,
+  getDocument,
+  updateDocument,
+} from '../firebase/documents';
 
 const FormQuote = ({ location: { search } }) => {
   const params = new URLSearchParams(search);
@@ -36,7 +40,7 @@ const FormQuote = ({ location: { search } }) => {
   const { currentUser } = getAuth();
   const [quote, setQuote] = React.useState({});
 
-  const request = !!id ? updateQuote : createQuote;
+  const request = !!id ? updateDocument : createDocument;
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -52,6 +56,7 @@ const FormQuote = ({ location: { search } }) => {
           validity: '',
           advancePaymentRate: '',
           hasTotalCalc: '',
+          hasTaxes: '',
           notes: [],
         },
     validationSchema: Yup.object({
@@ -63,10 +68,11 @@ const FormQuote = ({ location: { search } }) => {
       validity: Yup.string().required('Este campo es requerido'),
       advancePaymentRate: Yup.string().required('Este campo es requerido'),
       hasTotalCalc: Yup.string().required('Este campo es requerido'),
+      hasTaxes: Yup.string().required('Este campo es requerido'),
       notes: Yup.array().required('Este campo es requerido'),
     }),
     onSubmit: (values, { resetForm, setSubmitting }) => {
-      request(values, id).then(() => {
+      request('quotes', values, id).then(() => {
         setSubmitting(false);
         toast({
           title: 'Todo salió bien',
@@ -79,14 +85,14 @@ const FormQuote = ({ location: { search } }) => {
           position: 'top-right',
         });
         resetForm({ values: formik.initialValues });
-        navigate('/all-quotes');
+        navigate('/all-documents');
       });
     },
   });
 
   React.useEffect(() => {
     !!id &&
-      getQuote(id).then((res) => {
+      getDocument('quotes', id).then((res) => {
         setQuote(res);
       });
   }, [id]);
@@ -218,6 +224,34 @@ const FormQuote = ({ location: { search } }) => {
               <FormErrorMessage>{formik.errors.products}</FormErrorMessage>
             </FormControl>
             <SimpleGrid columns='2' gap='4' w='full'>
+              <FormControl isInvalid={!!formik.errors.hasTotalCalc}>
+                <FormLabel>¿Lleva cálculo total?</FormLabel>
+                <Select
+                  name='hasTotalCalc'
+                  onChange={formik.handleChange}
+                  placeholder='Selecciona una opción'
+                  value={formik.values.hasTotalCalc}
+                >
+                  <option value='true'>Sí</option>
+                  <option value='false'>No</option>
+                </Select>
+                <FormErrorMessage>
+                  {formik.errors.hasTotalCalc}
+                </FormErrorMessage>
+              </FormControl>
+              <FormControl isInvalid={!!formik.errors.hasTaxes}>
+                <FormLabel>¿Lleva I.V.A?</FormLabel>
+                <Select
+                  name='hasTaxes'
+                  onChange={formik.handleChange}
+                  placeholder='Selecciona una opción'
+                  value={formik.values.hasTaxes}
+                >
+                  <option value='true'>Sí</option>
+                  <option value='false'>No</option>
+                </Select>
+                <FormErrorMessage>{formik.errors.hasTaxes}</FormErrorMessage>
+              </FormControl>
               <FormControl isInvalid={!!formik.errors.deliveryTime}>
                 <FormLabel>Tiempo de entrega:</FormLabel>
                 <Input
@@ -253,21 +287,6 @@ const FormQuote = ({ location: { search } }) => {
                 />
                 <FormErrorMessage>
                   {formik.errors.advancePaymentRate}
-                </FormErrorMessage>
-              </FormControl>
-              <FormControl isInvalid={!!formik.errors.hasTotalCalc}>
-                <FormLabel>¿Lleva cálculo total?</FormLabel>
-                <Select
-                  name='hasTotalCalc'
-                  onChange={formik.handleChange}
-                  placeholder='Selecciona una opción'
-                  value={formik.values.hasTotalCalc}
-                >
-                  <option value='true'>Sí</option>
-                  <option value='false'>No</option>
-                </Select>
-                <FormErrorMessage>
-                  {formik.errors.hasTotalCalc}
                 </FormErrorMessage>
               </FormControl>
             </SimpleGrid>

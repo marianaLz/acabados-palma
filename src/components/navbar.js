@@ -2,7 +2,16 @@ import * as React from 'react';
 import { getAuth } from 'firebase/auth';
 import { Link, navigate } from 'gatsby';
 
-import { Button, Flex, IconButton, Image } from '@chakra-ui/react';
+import {
+  Button,
+  Flex,
+  IconButton,
+  Image,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from '@chakra-ui/react';
 import { AddIcon, ArrowBackIcon } from '@chakra-ui/icons';
 
 import { logout } from '../firebase/auth';
@@ -27,7 +36,7 @@ const Navbar = ({ secondary = false }) => {
           <Button
             as={Link}
             leftIcon={<ArrowBackIcon />}
-            to='/all-quotes'
+            to='/all-documents'
             variant='outline'
           >
             Regresar
@@ -37,12 +46,21 @@ const Navbar = ({ secondary = false }) => {
         )}
         <Flex gap={{ base: '2', lg: '4' }}>
           {!secondary && (
-            <IconButton
-              as={Link}
-              colorScheme='teal'
-              to='/form-quote'
-              icon={<AddIcon />}
-            />
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                colorScheme='teal'
+                icon={<AddIcon />}
+              />
+              <MenuList>
+                <MenuItem as={Link} colorScheme='teal' to='/form-quote'>
+                  Nuevo presupuesto
+                </MenuItem>
+                <MenuItem as={Link} to='/form-warranty'>
+                  Nueva garantía
+                </MenuItem>
+              </MenuList>
+            </Menu>
           )}
           <Button colorScheme='teal' onClick={handleLogout} variant='outline'>
             Salir
