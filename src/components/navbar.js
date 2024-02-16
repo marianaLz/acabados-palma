@@ -57,7 +57,7 @@ const Navbar = ({ secondary = false }) => {
                   Nuevo presupuesto
                 </MenuItem>
                 <MenuItem as={Link} to='/form-warranty'>
-                  Nueva garantía
+                  Nuevo documento
                 </MenuItem>
               </MenuList>
             </Menu>

@@ -72,6 +72,38 @@ const Warranty = ({ location: { search } }) => {
     });
   }, [id]);
 
+  const renderSignature = (isFirst, hasDigitalSignature) => (
+    <Flex
+      align='center'
+      flexDir='column'
+      gap='1'
+      key={isFirst ? 'signature-0' : 'signature-1'}
+      mt={isFirst && hasDigitalSignature ? '0' : '20'}
+      textAlign='center'
+    >
+      {isFirst && hasDigitalSignature && (
+        <Image alt='Acabados Palma' mb='-20' src={firma} w='28' />
+      )}
+      <Divider w='56' />
+      <Text fontWeight='semibold' textAlign='center'>
+        {isFirst
+          ? 'CARLOS ALBERTO PALMA BALLINA'
+          : warranty.client.toUpperCase()}
+      </Text>
+    </Flex>
+  );
+
+  const renderSignatures = (hasDigitalSignature, requiresTwoSignatures) =>
+    requiresTwoSignatures ? (
+      <Flex align='flex-end' gap='16'>
+        {Array.from({ length: 2 }).map((_, index) =>
+          renderSignature(index === 0, hasDigitalSignature)
+        )}
+      </Flex>
+    ) : (
+      renderSignature(true, hasDigitalSignature)
+    );
+
   return (
     <Container as='main' maxW='container.md'>
       <Navbar secondary />
@@ -108,18 +140,16 @@ const Warranty = ({ location: { search } }) => {
               <Text align='center' fontSize='sm' fontWeight='semibold'>
                 {warranty.name}
               </Text>
-              <Text>{warranty.client},</Text>
               {warranty.paragraphs?.map((paragraph, index) => (
                 <Text key={`paragraph-${index}`}>{paragraph}</Text>
               ))}
             </Flex>
-            <Image alt='Acabados Palma' mb='-28' src={firma} w='32' />
-            <Flex flexDir='column' fontWeight='bold' textAlign='center'>
-              <Text fontSize='2xs' letterSpacing='widest'>
-                ATENTAMENTE
-              </Text>
-              <Text>CARLOS ALBERTO PALMA BALLINA</Text>
-            </Flex>
+
+            {renderSignatures(
+              warranty.hasDigitalSignature === 'true',
+              warranty.requiresTwoSignatures === 'true'
+            )}
+
             <Flex fontSize='2xs' gap='4' justify='center'>
               <Text>(55) 3450 4035</Text>
               <Text>(55) 8410 0093</Text>

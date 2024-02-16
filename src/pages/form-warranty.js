@@ -15,6 +15,8 @@ import {
   Heading,
   IconButton,
   Input,
+  Select,
+  SimpleGrid,
   Textarea,
   useToast,
 } from '@chakra-ui/react';
@@ -54,14 +56,16 @@ const FormWarranty = ({ location: { search } }) => {
       client: Yup.string().required('Este campo es requerido'),
       date: Yup.string().required('Este campo es requerido'),
       paragraphs: Yup.array().required('Este campo es requerido'),
+      hasDigitalSignature: Yup.string().required('Este campo es requerido'),
+      requiresTwoSignatures: Yup.string().required('Este campo es requerido'),
     }),
     onSubmit: (values, { resetForm, setSubmitting }) => {
       request('warranties', values, id).then(() => {
         setSubmitting(false);
         toast({
           title: 'Todo salió bien',
-          description: `Garantía ${
-            !!id ? 'modificada' : 'creada'
+          description: `Documento ${
+            !!id ? 'modificado' : 'creado'
           } de manera exitosa`,
           status: 'success',
           duration: 3000,
@@ -92,10 +96,10 @@ const FormWarranty = ({ location: { search } }) => {
         <Box as='form' onSubmit={formik.handleSubmit} w='full'>
           <Flex align='center' flexDir='column' gap='4'>
             <Heading textAlign='center' color='blackAlpha.800' size='lg'>
-              {!!id ? 'Modifica tu garantía' : 'Crea tu garantía'}
+              {!!id ? 'Modifica tu documento' : 'Crea tu documento'}
             </Heading>
             <FormControl isInvalid={!!formik.errors.name}>
-              <FormLabel>Nombre de la garantía:</FormLabel>
+              <FormLabel>Nombre del documento:</FormLabel>
               <Input
                 name='name'
                 onChange={formik.handleChange}
@@ -166,13 +170,45 @@ const FormWarranty = ({ location: { search } }) => {
               </FormikProvider>
               <FormErrorMessage>{formik.errors.paragraphs}</FormErrorMessage>
             </FormControl>
+            <SimpleGrid columns='2' gap='4' w='full'>
+              <FormControl isInvalid={!!formik.errors.hasDigitalSignature}>
+                <FormLabel>¿Lleva firma digital?</FormLabel>
+                <Select
+                  name='hasDigitalSignature'
+                  onChange={formik.handleChange}
+                  placeholder='Selecciona una opción'
+                  value={formik.values.hasDigitalSignature}
+                >
+                  <option value='true'>Sí</option>
+                  <option value='false'>No</option>
+                </Select>
+                <FormErrorMessage>
+                  {formik.errors.hasDigitalSignature}
+                </FormErrorMessage>
+              </FormControl>
+              <FormControl isInvalid={!!formik.errors.requiresTwoSignatures}>
+                <FormLabel>¿Requiere dos firmas?</FormLabel>
+                <Select
+                  name='requiresTwoSignatures'
+                  onChange={formik.handleChange}
+                  placeholder='Selecciona una opción'
+                  value={formik.values.requiresTwoSignatures}
+                >
+                  <option value='true'>Sí</option>
+                  <option value='false'>No</option>
+                </Select>
+                <FormErrorMessage>
+                  {formik.errors.requiresTwoSignatures}
+                </FormErrorMessage>
+              </FormControl>
+            </SimpleGrid>
             <Button
               colorScheme='teal'
               isLoading={formik.isSubmitting}
               loadingText='Cargando...'
               type='submit'
             >
-              {!!id ? 'Modificar garantía' : 'Generar garantía'}
+              {!!id ? 'Modificar documento' : 'Generar documento'}
             </Button>
           </Flex>
         </Box>
